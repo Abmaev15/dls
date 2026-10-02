@@ -1,0 +1,36 @@
+name: Copy PyTorch intro notebook
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/copy_pytorch_intro.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  copy-notebook:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout destination repository
+        uses: actions/checkout@v4
+
+      - name: Copy notebook from cell_sim
+        run: |
+          mkdir -p week_04_intro_to_neural_nets/Practice
+          curl -L --fail \
+            'https://raw.githubusercontent.com/Abmaev15/cell_sim/main/week_04_intro_to_neural_nets/Practice/part_1_PyTorch_intro.ipynb' \
+            -o week_04_intro_to_neural_nets/Practice/part_1_PyTorch_intro.ipynb
+
+      - name: Commit copied notebook
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add week_04_intro_to_neural_nets/Practice/part_1_PyTorch_intro.ipynb
+          if git diff --cached --quiet; then
+            echo 'No changes to commit.'
+          else
+            git commit -m 'Add DLS PyTorch intro notebook'
+            git push
+          fi
